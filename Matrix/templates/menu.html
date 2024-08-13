@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('/static/IMAGENES/fondo_Web.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #070707;
+        }
+        nav {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 20px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(159, 255, 117, 0.9); /* fondo del menu*/
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 80px; /* Add margin-top to avoid overlap with the fixed nav */
+        }
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 250px;
+            margin: 10px auto;
+            padding: 15px;
+            font-size: 18px;
+            color: #fff;
+            background-color: rgb(23, 126, 63); 
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .button i {
+            margin-right: 10px;
+        }
+        .button:hover {
+            background-color: rgb(19, 104, 53);
+            transform: translateY(-2px);
+        }
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            text-align: center;
+            color: #fff;
+        }
+        footer a {
+            color: #fff;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Perfil</a>
+        <span style=color:white> {{user.username}} </span>
+        <a href="{% url 'cerrar' %}">Cerrar Sesion</a>
+    </nav>
+    <div class="container">
+        <h1>Menú Principal</h1>
+        <a href="{%url 'apertura'%}" class="button"><i class="fa fa-door-open"></i>Apertura de Caja</a>
+        <a href="{%url 'cierre'%}" class="button"><i class="fa fa-door-closed"></i>Cierre de Caja</a>
+        <a href="#" class="button"><i class="fa fa-clipboard-list"></i>Inventario</a>
+        <a href="#" class="button"><i class="fa fa-shopping-cart"></i>Compras</a>
+        <a href="{%url 'ventas'%}" class="button"><i class="fa fa-cash-register"></i>Ventas</a>
+    </div>
+</body>
+</html>
