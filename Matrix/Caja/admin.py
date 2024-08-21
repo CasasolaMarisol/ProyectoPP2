@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import caja
+from .models import *
 
 class CajaAdmin(admin.ModelAdmin):
-    list_display = ('Empleado', 'Apertura_de_Caja', 'Saldo_Inicial', 'Cierre_de_Caja', 'Saldo_Total')
+    list_display = ('empleado', 'fecha_apertura', 'saldo_inicial', 'fecha_cierre', 'saldo_final')
 
-admin.site.register(caja, CajaAdmin)
+admin.site.register(Caja, CajaAdmin)
 
 # Register your models here.

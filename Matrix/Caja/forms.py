@@ -1,12 +1,12 @@
-from .models import caja
+from .models import Caja
 from django.forms import ModelForm
 
 class apertura(ModelForm):
     class Meta:
-        model=caja
-        fields = ['Apertura_de_Caja','Saldo_Inicial']
+        model=Caja
+        fields = ['fecha_apertura','saldo_inicial']
 
 class cierre(ModelForm):
     class Meta:
-        model = caja
-        fields = ['Cierre_de_Caja', 'Saldo_Total']
+        model = Caja
+        fields = ['fecha_cierre', 'saldo_final']

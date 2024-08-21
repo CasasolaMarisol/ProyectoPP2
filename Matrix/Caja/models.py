@@ -1,15 +1,14 @@
 from django.db import models
 from Empleados.models import Empleado
 from datetime import datetime
-class caja(models.Model):
-    Empleado=models.ForeignKey(Empleado,on_delete=models.CASCADE,null=True,blank=True)
-    Apertura_de_Caja=models.DateTimeField(default=datetime.now, null=True, blank=True)
-    Saldo_Inicial=models.IntegerField(null=True,blank=True)
-    Cierre_de_Caja=models.DateTimeField(default=datetime.now, null=True,blank=True)
-    Saldo_Total=models.IntegerField(null=True,blank=True)
-    
+class Caja(models.Model):
+    empleado=models.ForeignKey(Empleado,on_delete=models.CASCADE,null=True,blank=True)
+    fecha_apertura=models.DateTimeField(default=datetime.now, null=True, blank=True)
+    saldo_inicial=models.IntegerField(null=True,blank=True)
+    fecha_cierre=models.DateTimeField(default=datetime.now, null=True,blank=True)
+    saldo_final=models.IntegerField(null=True,blank=True)    
     
     def __str__(self):
-        return f"{self.Apertura_de_Caja} {self.Saldo_Inicial} {self.Cierre_de_Caja} {self.Saldo_Total}"
+        return f"{self.empleado} {self.fecha_apertura} {self.fecha_cierre} {self.saldo_final}"
 
 # Create your models here.

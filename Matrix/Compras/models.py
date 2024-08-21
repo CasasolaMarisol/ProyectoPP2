@@ -1,9 +1,9 @@
 from django.db import models
-from Productos.models import producto
+from Productos.models import Producto
 from Proveedores.models import proveedore
 
 class compra(models.Model):
-    Producto=models.ForeignKey(producto, on_delete=models.CASCADE)
+    Producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
     Proveedor=models.ForeignKey(proveedore, on_delete=models.CASCADE)
     Precio_Unitario=models.DecimalField(max_digits=6, decimal_places=2)
     Cantidad=models.IntegerField()

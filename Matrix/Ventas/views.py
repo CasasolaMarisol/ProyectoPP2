@@ -1,69 +1,63 @@
 from django.shortcuts import render, redirect
-from Productos.models import producto
-
-def ventas(request):
-    lista_productos = producto.objects.all()
-    return render(request, 'ventas.html', {'lista_productos': lista_productos})
-
-def actualizar_cantidad(request, id_producto):
-    lista_productos = producto.objects.all()
-    producto_buscado = producto.objects.get(id=id_producto)
-    if 'carrito' not in request.session:
-        request.session['carrito'] = []
-        
-    carrito = request.session['carrito']
-
-    producto_a_vender = {
-        'id': producto_buscado.id,
-        'nombre': producto_buscado.Nombre,
-        'precio': float(producto_buscado.Precio),
-        'cantidad': 1,
-        'subtotal': float(producto_buscado.Precio)
-    }
-    
-    producto_encontrado = False
-    for item in carrito:
-        if producto_a_vender['id'] == item['id']:
-            producto_encontrado = True
-            if request.method == 'POST':
-                nueva_cantidad = int(request.POST.get('cantidad'))
-                diferencia = nueva_cantidad - item['cantidad']
-                
-                if diferencia > 0:
-                    producto_buscado.Existencias -= diferencia
-                else:
-                    producto_buscado.Existencias += abs(diferencia)
-                
-                item['cantidad'] = nueva_cantidad
-                item['subtotal'] = item['cantidad'] * item['precio']
-                producto_buscado.save()
-
-    if not producto_encontrado:
-        if request.method == 'POST':
-            nueva_cantidad = int(request.POST.get('cantidad'))
-            producto_a_vender['cantidad'] = nueva_cantidad
-            producto_a_vender['subtotal'] = nueva_cantidad * producto_a_vender['precio']
-            carrito.append(producto_a_vender)
-            producto_buscado.Existencias -= nueva_cantidad
-            producto_buscado.save()
-
-    request.session.modified = True
-    return render(request, 'ventas.html', {'carrito': carrito, 'lista_productos': lista_productos})
+from Productos.models import *
+from .models import *
+from .forms import *
+def panel_venta(request):
+    lista_producto=Producto.objects.all()
+    if not Venta.objects.exists():
+        venta=Venta.objects.create()
+        request.session['id_venta']=venta.id
+        productos=venta.productos_vendidos_set.all()
+        venta.total_venta=0
+        for producto in productos:
+            venta.total_venta+=producto.subtotal
+        formularioP=Formulario_Pago()
+        venta.save()
+    else:
+        venta=Venta.objects.last()
+        request.session['id_venta']=venta.id
+        productos=venta.productos_vendidos_set.all()
+        venta.total_venta=0
+        for producto in productos:
+            venta.total_venta+=producto.subtotal
+        formularioP=Formulario_Pago()
+        venta.save()
+    return render(request,'ventas.html', {'lista_producto':lista_producto, 'venta':venta,
+                                         'productos':productos, 'formularioP':formularioP})
+def agregar_producto(request,id_producto):
+    id_venta=request.session.get('id_venta')
+    venta=Venta.objects.get(id=id_venta)
+    if request.method == 'POST':
+        producto=Producto.objects.get(id=id_producto)
+        cantidad=int(request.POST.get('cantidad'))
+        subtotal=producto.precio*cantidad
+        venta.productos.add(producto,through_defaults={'cantidad':cantidad,'subtotal':subtotal})
+        producto.existencias-=cantidad
+        producto.save()
+    return redirect('panel_venta')
 
 def eliminar_producto(request, id_producto):
-    carrito = request.session.get('carrito', [])
-    for item in carrito:
-        if item['id'] == id_producto:
-            producto_buscado = producto.objects.get(id=id_producto)
-            producto_buscado.Existencias += item['cantidad']
-            producto_buscado.save()
-            carrito.remove(item)
-            break
-    
-    request.session.modified = True
-    return redirect('ventas')
+    id_venta=request.session.get('id_venta')
+    venta=Venta.objects.get(id=id_venta)
+    producto_a_eliminar=Producto.objects.get(id=id_producto)
+    cantidad_eliminada=venta.productos_vendidos_set.get(producto=producto_a_eliminar).cantidad
+    venta.productos.remove(producto_a_eliminar)
+    producto_a_eliminar.existencias+=cantidad_eliminada
+    producto_a_eliminar.save()
+    return redirect('panel_venta')
 
-def vaciar_carrito(request):
-    request.session['carrito'] = []
-    request.session.modified = True
-    return redirect('ventas')
+def crear_factura(request, id_venta):
+    venta=Venta.objects.get(id=id_venta)
+    if request.method == 'POST':
+        formularioP=Formulario_Pago(request.POST, instance=venta)
+        if formularioP.is_valid():
+            formularioP.save()
+    venta.fecha=datetime.now()
+    venta.id_sesion=request.session.session_key
+    venta.save()
+    productos_a_vender=venta.productos_vendidos_set.all()
+    return render(request,'factura.html',{'venta':venta,'productos_a_vender':productos_a_vender})
+
+def nueva_venta(request):
+    venta=Venta.objects.create()
+    return redirect('panel_venta')

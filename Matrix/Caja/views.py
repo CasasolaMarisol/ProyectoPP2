@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
-from .forms import apertura, cierre
+from .forms import *
 from Empleados.models import Empleado
-from .models import caja
+from .models import Caja
+from Ventas.models import *
+from datetime import datetime
 
 def apertura_view(request):
     if request.method == 'GET':
+        
         formulario_apertura=apertura()
         return render(request, 'apertura.html', {'formulario_apertura': formulario_apertura})
 
@@ -22,7 +25,7 @@ def cierre_view(request):
         return render(request, 'cierre.html', {'formulario_cierre': formulario_cierre})
 
     if request.method == 'POST':
-        caja_a_cerrar=caja.objects.filter(Empleado=request.user).latest('Apertura_de_Caja')
+        caja_a_cerrar=Caja.objects.filter(Empleado=request.user).latest('Apertura_de_Caja')
         formulario_cierre=cierre(request.POST, instance=caja_a_cerrar)
         if formulario_cierre.is_valid():
             formulario_cierre.save()
